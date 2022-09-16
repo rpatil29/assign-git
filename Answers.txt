@@ -11,3 +11,4 @@ Additionally, it makes later version fusion in Git much simpler.
 
 • In a project how many remote Git repositories do you usually have?
 You can have as many remote git repositories as you want. Every remote repository should be traceable. 
+All repositories should have proper naming. 
