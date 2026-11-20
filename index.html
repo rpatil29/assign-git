@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Girlfriend Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ✏️ Edit the two names in the CONFIG block in the <script> at the bottom. */
+  :root {
+    --bg: #fff5f6; --card: #ffffff; --ink: #2b1b22; --muted: #7a6670;
+    --accent: #e8446a; --accent-ink: #ffffff; --soft: #ffe1e8; --line: #f2d3db;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1216; --card: #2a1c22; --ink: #fbeef2; --muted: #c4a9b3;
+      --accent: #ff6b8e; --accent-ink: #1c1216; --soft: #3d2530; --line: #44303a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+    font-family: Inter, system-ui, sans-serif; line-height: 1.5;
+    display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+  }
+  .card {
+    width: 100%; max-width: 460px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 22px; padding: 28px 22px; box-shadow: 0 10px 40px rgba(232,68,106,.12);
+  }
+  h1, h2 { font-family: Fraunces, Georgia, serif; margin: 0 0 8px; line-height: 1.2; }
+  h1 { font-size: 30px; } h2 { font-size: 22px; }
+  p { margin: 0 0 16px; color: var(--muted); }
+  .heart { font-size: 44px; text-align: center; margin-bottom: 8px; }
+  .progress { height: 6px; background: var(--soft); border-radius: 99px; margin-bottom: 22px; overflow: hidden; }
+  .progress > div { height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+  .step-label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+  .options { display: grid; gap: 10px; margin: 18px 0; }
+  .opt {
+    text-align: left; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--line);
+    background: transparent; color: var(--ink); font: inherit; cursor: pointer;
+  }
+  .opt.selected { border-color: var(--accent); background: var(--soft); }
+  input[type=text], textarea {
+    width: 100%; padding: 14px; border-radius: 14px; border: 1.5px solid var(--line);
+    background: transparent; color: var(--ink); font: inherit; margin: 14px 0 18px;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  .btn {
+    width: 100%; padding: 15px; border: 0; border-radius: 14px; background: var(--accent);
+    color: var(--accent-ink); font: inherit; font-weight: 600; font-size: 16px; cursor: pointer;
+  }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.ghost { background: transparent; color: var(--muted); font-weight: 500; margin-top: 8px; }
+  .row { display: flex; gap: 10px; }
+  .summary { background: var(--soft); border-radius: 16px; padding: 16px; margin: 16px 0; }
+  .summary div { margin-bottom: 10px; }
+  .summary div:last-child { margin-bottom: 0; }
+  .summary b { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
+  .stamp {
+    display: inline-block; border: 2px solid var(--accent); color: var(--accent); border-radius: 8px;
+    padding: 4px 10px; font-weight: 600; transform: rotate(-4deg); margin-bottom: 10px;
+  }
+  .fine { font-size: 12px; text-align: center; color: var(--muted); margin-top: 14px; }
+</style>
+</head>
+<body>
+<main class="card" id="app"></main>
+
+<script>
+/* ===== CONFIG: change these ===== */
+const CONFIG = {
+  herName: "you",          // e.g. "Sarah"  (used as "Hey Sarah")
+  myName:  "me",           // your first name
+};
+/* ================================= */
+
+const questions = [
+  { type: "choice", q: "First things first: how did you feel when we matched?",
+    options: ["🎉 Thrilled, obviously", "😏 Intrigued", "🤔 Cautiously optimistic", "Swiped right by accident (ouch)"] },
+  { type: "choice", q: "Ideal first date?",
+    options: ["☕ Coffee + a long walk", "🍜 Trying a new restaurant", "🎳 Something competitive (bowling, mini golf)", "🌅 Sunset somewhere pretty"] },
+  { type: "choice", q: "Pineapple on pizza?",
+    options: ["Yes, and I'll defend it", "Absolutely not", "Only if you're paying", "I'm here for the drama"] },
+  { type: "text", q: "Your go-to karaoke song (or the one you'd sing if forced)?", placeholder: "Type it in…" },
+  { type: "choice", q: "Dogs or cats?",
+    options: ["🐶 Dogs", "🐱 Cats", "Both, I'm greedy", "Neither, I'm a plant person 🪴"] },
+  { type: "text", q: "One green flag you look for in someone?", placeholder: "Be honest 👀", long: true },
+  { type: "choice", q: "On a scale of 1 to 10, how likely is a second date?",
+    options: ["10, book it", "7, depends on the first one", "Let's see how the first one goes 😌", "Ask me after coffee"] },
+];
+
+const app = document.getElementById("app");
+const answers = [];
+let i = 0;
+
+const hey = CONFIG.herName === "you" ? "Hey there" : `Hey ${CONFIG.herName}`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+function intro() {
+  app.innerHTML = `
+    <div class="heart">💌</div>
+    <h1>${esc(hey)}!</h1>
+    <p>You've been personally selected to apply for a <b>very exclusive</b> position: my girlfriend.</p>
+    <p>It's ${questions.length} quick questions. No wrong answers (well… mostly). There's a no-thanks button too, no pressure.</p>
+    <button class="btn" id="start">Start my application</button>
+    <button class="btn ghost" id="decline">No thanks</button>`;
+  document.getElementById("start").onclick = () => { i = 0; render(); };
+  document.getElementById("decline").onclick = declined;
+}
+
+function declined() {
+  app.innerHTML = `
+    <div class="heart">🙂</div>
+    <h2>Totally fair!</h2>
+    <p>Thanks for clicking anyway. It was nice matching with you. Feel free to just keep chatting on the app.</p>
+    <button class="btn ghost" id="back">Wait, I changed my mind</button>`;
+  document.getElementById("back").onclick = intro;
+}
+
+function render() {
+  const item = questions[i];
+  const pct = Math.round((i / questions.length) * 100);
+  let body = "";
+  if (item.type === "choice") {
+    body = `<div class="options">${item.options.map((o, k) =>
+      `<button class="opt ${answers[i] === o ? "selected" : ""}" data-k="${k}">${esc(o)}</button>`).join("")}</div>`;
+  } else {
+    const val = esc(answers[i] || "");
+    body = item.long
+      ? `<textarea id="txt" placeholder="${esc(item.placeholder)}">${val}</textarea>`
+      : `<input type="text" id="txt" placeholder="${esc(item.placeholder)}" value="${val}">`;
+  }
+  app.innerHTML = `
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    <div class="step-label">Question ${i + 1} of ${questions.length}</div>
+    <h2>${esc(item.q)}</h2>
+    ${body}
+    <div class="row">
+      ${i > 0 ? `<button class="btn ghost" id="prev" style="margin-top:0">Back</button>` : ""}
+      <button class="btn" id="next" ${answers[i] ? "" : "disabled"}>${i === questions.length - 1 ? "Submit application" : "Next"}</button>
+    </div>`;
+
+  const next = document.getElementById("next");
+  if (item.type === "choice") {
+    app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      answers[i] = item.options[+b.dataset.k];
+      app.querySelectorAll(".opt").forEach(x => x.classList.remove("selected"));
+      b.classList.add("selected");
+      next.disabled = false;
+    });
+  } else {
+    const t = document.getElementById("txt");
+    t.focus();
+    t.oninput = () => { answers[i] = t.value.trim(); next.disabled = !answers[i]; };
+  }
+  next.onclick = () => { if (++i < questions.length) render(); else done(); };
+  const prev = document.getElementById("prev");
+  if (prev) prev.onclick = () => { i--; render(); };
+}
+
+function done() {
+  app.innerHTML = `
+    <div class="progress"><div style="width:100%"></div></div>
+    <div style="text-align:center"><span class="stamp">APPLICATION RECEIVED ✓</span></div>
+    <h2 style="text-align:center">You're officially under review 😌</h2>
+    <p style="text-align:center"><b>Last step:</b> screenshot this card and send it to ${esc(CONFIG.myName)} on Tinder.</p>
+    <div class="summary">
+      ${questions.map((qq, k) => `<div><b>${esc(qq.q)}</b>${esc(answers[k])}</div>`).join("")}
+    </div>
+    <p class="fine">Nothing you typed was saved or sent anywhere. It only lives in this screenshot.</p>`;
+}
+
+intro();
+</script>
+</body>
+</html>
