@@ -71,24 +71,18 @@
 <script>
 /* ===== CONFIG: change these ===== */
 const CONFIG = {
-  herName: "you",          // e.g. "Sarah"  (used as "Hey Sarah")
-  myName:  "me",           // your first name
+  herName: "Brin",          // e.g. "Sarah"  (used as "Hey Sarah")
+  myName:  "Rushi",           // your first name
 };
 /* ================================= */
 
 const questions = [
-  { type: "choice", q: "First things first: how did you feel when we matched?",
-    options: ["🎉 Thrilled, obviously", "😏 Intrigued", "🤔 Cautiously optimistic", "Swiped right by accident (ouch)"] },
-  { type: "choice", q: "Ideal first date?",
-    options: ["☕ Coffee + a long walk", "🍜 Trying a new restaurant", "🎳 Something competitive (bowling, mini golf)", "🌅 Sunset somewhere pretty"] },
-  { type: "choice", q: "Pineapple on pizza?",
-    options: ["Yes, and I'll defend it", "Absolutely not", "Only if you're paying", "I'm here for the drama"] },
-  { type: "text", q: "Your go-to karaoke song (or the one you'd sing if forced)?", placeholder: "Type it in…" },
-  { type: "choice", q: "Dogs or cats?",
-    options: ["🐶 Dogs", "🐱 Cats", "Both, I'm greedy", "Neither, I'm a plant person 🪴"] },
-  { type: "text", q: "One green flag you look for in someone?", placeholder: "Be honest 👀", long: true },
-  { type: "choice", q: "On a scale of 1 to 10, how likely is a second date?",
-    options: ["10, book it", "7, depends on the first one", "Let's see how the first one goes 😌", "Ask me after coffee"] },
+  { type: "choice", q: "Are you single?",
+    options: ["✅ Yes, very single", "Single, but my cat thinks otherwise 🐱", "It's complicated (with my bed)", "Asking for a friend? 👀"] },
+  { type: "choice", q: "Are you looking for a boyfriend?",
+    options: ["Yes, and I think I just found one 😏", "Maybe, if he's tall and funny", "Not looking… but open to being convinced", "Only if he brings snacks 🍿"] },
+  { type: "text", q: "What are your first date plans?", placeholder: "Coffee? Tacos? A heist? Tell me…", long: true },
+  { type: "text", q: "Can I add you on my Instagram? Drop your handle 📸", placeholder: "@yourhandle (or 'earn it first' 😌)" },
 ];
 
 const app = document.getElementById("app");
@@ -103,7 +97,7 @@ function intro() {
     <div class="heart">💌</div>
     <h1>${esc(hey)}!</h1>
     <p>You've been personally selected to apply for a <b>very exclusive</b> position: my girlfriend.</p>
-    <p>It's ${questions.length} quick questions. No wrong answers (well… mostly). There's a no-thanks button too, no pressure.</p>
+    <p>Just ${questions.length} quick questions from Rushi. No wrong answers (well… mostly). There's a no-thanks button too, no pressure.</p>
     <button class="btn" id="start">Start my application</button>
     <button class="btn ghost" id="decline">No thanks</button>`;
   document.getElementById("start").onclick = () => { i = 0; render(); };
